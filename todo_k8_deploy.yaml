@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo
+  labels:
+    app: todo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo
+  template:
+    metadata:
+      labels:
+        app: todo
+        type: django
+    spec:
+      imagePullSecrets:
+        - name: rjtshrm
+      containers:
+        - name: todo
+          image: rjtshrm.azurecr.io/todo:v2
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: todo-config
+          #env:
+          #  - name: ALLOWED_HOSTS
+          #    value: "*"
+          ports:
+            - name: web
+              containerPort: 8000
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo
+  labels:
+    app: todo
+spec:
+  type: LoadBalancer
+  selector:
+    app: todo
+    type: django
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: todo
+#   labels:
+#     app: todo
+# spec:
+#   type: NodePort
+#   selector:
+#     app: todo
+#     type: django
+#   ports:
+#     - name: http
+#       port: 8000
+#       targetPort: 8000
+#       nodePort: 30008
+#       protocol: TCP

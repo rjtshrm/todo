@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: todo
+  labels:
+    app: todo
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: todo
+  template:
+      metadata:
+        labels:
+          app: todo
+          type: django
+      spec:
+        imagePullSecrets:
+          - name: rjtshrm
+        containers:
+          - name: todo
+            image: rjtshrm.azurecr.io/todo:v2
+            imagePullPolicy: Always
+            ports:
+              - name: web
+                containerPort: 8000
+                protocol: TCP
